@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Underlap</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0f0f0f;
+    --ink-2: #3a3a3a;
+    --ink-3: #777;
+    --surface: #fff;
+    --surface-2: #f5f4f0;
+    --border: rgba(0,0,0,0.12);
+    --accent: #c8f135;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+  }
+  body { font-family: var(--sans); background: var(--surface); color: var(--ink); line-height: 1.5; font-size: 15px; }
+  a { text-decoration: none; color: inherit; }
+
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0;
+    background: var(--surface); z-index: 100;
+  }
+  .nav-logo { font-family: var(--serif); font-size: 20px; font-weight: bold; letter-spacing: -0.5px; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .nav-links a { color: var(--ink-2); }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-x { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink-2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; cursor: pointer; }
+  .nav-x:hover { background: var(--surface-2); }
+
+  /* HERO */
+  .hero { border-bottom: 1px solid var(--border); min-height: 420px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+  .hero-visual { position: absolute; inset: 0; }
+  .hero-visual img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 40%, rgba(0,0,0,0.18) 100%); }
+  .hero-content { position: relative; z-index: 2; padding: 2.5rem 2rem; color: #fff; }
+  .hero-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px; }
+  .pill-tactics { background: #c8f135; color: #0f0f0f; }
+  .pill-data { background: #1a3a6b; color: #a8c8f8; }
+  .pill-transfer { background: #4a1b0c; color: #f0997b; }
+  .hero-date { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .hero-title { font-family: var(--serif); font-size: 34px; line-height: 1.15; font-weight: bold; letter-spacing: -0.5px; margin-bottom: 0.75rem; max-width: 680px; color: #fff; }
+  .hero-excerpt { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.65; margin-bottom: 1.25rem; max-width: 580px; }
+  .hero-meta { display: flex; align-items: center; justify-content: space-between; max-width: 680px; }
+  .author-line { font-size: 13px; color: rgba(255,255,255,0.55); }
+  .author-line strong { color: #fff; font-weight: 600; }
+  .read-btn { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent); color: var(--ink); padding: 8px 18px; border-radius: 3px; cursor: pointer; }
+
+  /* TICKER */
+  .ticker { background: var(--ink); color: var(--accent); padding: 8px 0; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; overflow: hidden; white-space: nowrap; }
+  .ticker-inner { display: inline-block; animation: scroll 32s linear infinite; }
+  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .ticker-sep { margin: 0 2rem; opacity: 0.5; }
+
+  /* LAYOUT */
+  .main-wrap { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+  .section-head { display: flex; align-items: center; gap: 12px; padding: 2rem 0 1.25rem; border-bottom: 2px solid var(--ink); margin-bottom: 1.5rem; }
+  .section-head h2 { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .section-head-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* GRID */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--border); }
+  .article-card { padding: 1.5rem 1.25rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+  .article-card:nth-child(3n) { border-right: none; }
+  .article-card:hover { background: var(--surface-2); }
+  .article-card.empty { opacity: 0.38; cursor: default; background: none !important; }
+  .card-img { width: 100%; height: 140px; object-fit: cover; border-radius: 3px; margin-bottom: 0.85rem; }
+  .card-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+  .card-date { font-size: 11px; color: var(--ink-3); }
+  .card-title { font-family: var(--serif); font-size: 17px; line-height: 1.3; font-weight: bold; margin-bottom: 0.6rem; letter-spacing: -0.2px; }
+  .card-excerpt { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin-bottom: 1rem; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .read-time { font-size: 12px; color: var(--ink-3); }
+  .arrow-link { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+  .arrow-link:hover { color: var(--ink); }
+  .empty-label { font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2rem; }
+
+  /* X CTA */
+  .x-cta { background: var(--ink); color: #fff; padding: 2.5rem 2rem; margin: 2rem 0; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+  .x-cta-text h3 { font-family: var(--serif); font-size: 22px; margin-bottom: 0.4rem; color: var(--accent); }
+  .x-cta-text p { font-size: 13px; color: rgba(255,255,255,0.65); max-width: 440px; line-height: 1.6; }
+  .x-follow-btn { display: flex; align-items: center; gap: 8px; background: var(--accent); color: var(--ink); padding: 12px 24px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 3px; cursor: pointer; flex-shrink: 0; }
+
+  /* ABOUT STRIP */
+  .about-strip { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 2rem; margin: 1rem 0 2rem; display: flex; gap: 3rem; align-items: flex-start; }
+  .about-strip h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .about-strip p { font-size: 13px; color: var(--ink-2); line-height: 1.7; max-width: 520px; }
+  .about-pillars { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+  .pillar { font-size: 13px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+  .pillar-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--ink-3); }
+  .footer-logo { font-family: var(--serif); font-weight: bold; font-size: 16px; color: var(--ink); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a:hover { color: var(--ink); }
+
+  @media (max-width: 700px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { min-height: 220px; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .article-card { border-right: none; }
+    .x-cta { flex-direction: column; }
+    .about-strip { flex-direction: column; gap: 1.5rem; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://www.theunderlap.com" class="nav-logo">The Underlap</a>
+  <ul class="nav-links">
+    <li><a href="#">Tactics</a></li>
+    <li><a href="#">Data</a></li>
+    <li><a href="#">Transfers</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <a href="https://x.com/theunderlap" class="nav-x">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    Follow on X
+  </a>
+</nav>
+
+<!-- HERO: Salah/Haaland/Isak feature -->
+<a href="https://www.theunderlap.com/2025/11/how-salahs-golden-boot-illustrates.html">
+<section class="hero">
+  <div class="hero-visual">
+    <img id="heroImg" src="https://i.ibb.co/nNmtktNR/Article-1.png" alt="Mohamed Salah with Premier League trophy and awards" style="width:100%;height:100%;object-fit:cover;object-position:center top;" />
+    <div class="hero-overlay"></div>
+    <div style="position:absolute;bottom:8px;right:12px;font-size:10px;color:rgba(255,255,255,0.45);z-index:3;letter-spacing:0.04em;">Photo: Premier League</div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="pill pill-data">Data</span>
+      <span class="hero-date">November 9, 2025</span>
+    </div>
+    <h1 class="hero-title">How Salah's Golden Boot Illustrates the Trade-Off Haaland and Isak Couldn't Master</h1>
+    <p class="hero-excerpt">Shearer said to keep shooting. The data from last season's top scorers says the story is more complicated than that.</p>
+    <div class="hero-meta">
+      <span class="author-line">By <strong>The Underlap</strong> &nbsp;·&nbsp; 7 min read</span>
+      <span class="read-btn">Read →</span>
+    </div>
+  </div>
+</section>
+</a>
+
+
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-inner">
+    Tactical Breakdown &nbsp;<span class="ticker-sep">/</span>&nbsp; Amorim's tactical correction at United &nbsp;<span class="ticker-sep">/</span>&nbsp; Data Stories &nbsp;<span class="ticker-sep">/</span>&nbsp; Salah, Haaland, Isak: the trade-off nobody mastered &nbsp;<span class="ticker-sep">/</span>&nbsp; Football explained deeply and clearly &nbsp;<span class="ticker-sep">/</span>&nbsp; theunderlap.com &nbsp;<span class="ticker-sep">/</span>&nbsp; Tactical Breakdown &nbsp;<span class="ticker-sep">/</span>&nbsp; Amorim's tactical correction at United &nbsp;<span class="ticker-sep">/</span>&nbsp; Data Stories &nbsp;<span class="ticker-sep">/</span>&nbsp; Salah, Haaland, Isak: the trade-off nobody mastered &nbsp;<span class="ticker-sep">/</span>&nbsp; Football explained deeply and clearly &nbsp;<span class="ticker-sep">/</span>&nbsp; theunderlap.com &nbsp;<span class="ticker-sep">/</span>&nbsp;
+  </span>
+</div>
+
+<div class="main-wrap">
+
+  <!-- ALL ARTICLES -->
+  <div class="section-head">
+    <h2>All Articles</h2>
+    <div class="section-head-line"></div>
+  </div>
+
+  <div class="grid-3">
+
+    <!-- Real Article 1 -->
+    <a href="https://www.theunderlap.com/2025/11/the-subtle-shift-behind-manchester.html" class="article-card">
+      <div class="card-eyebrow">
+        <span class="pill pill-tactics">Tactics</span>
+        <span class="card-date">Nov 28, 2025</span>
+      </div>
+      <h3 class="card-title">The Subtle Shift Behind Manchester United's Season</h3>
+      <p class="card-excerpt">A tactical correction hiding in plain sight. The numbers reveal how Amorim's side changed across two distinct phases of the season.</p>
+      <div class="card-footer">
+        <span class="read-time">10 min</span>
+        <span class="arrow-link">Read →</span>
+      </div>
+    </a>
+
+    <!-- Real Article 2 -->
+    <a href="https://www.theunderlap.com/2025/11/how-salahs-golden-boot-illustrates.html" class="article-card">
+      <div class="card-eyebrow">
+        <span class="pill pill-data">Data</span>
+        <span class="card-date">Nov 9, 2025</span>
+      </div>
+      <h3 class="card-title">How Salah's Golden Boot Illustrates the Trade-Off Haaland and Isak Couldn't Master</h3>
+      <p class="card-excerpt">Shearer said to keep shooting. The data from last season's top scorers says the story is more complicated.</p>
+      <div class="card-footer">
+        <span class="read-time">7 min</span>
+        <span class="arrow-link">Read →</span>
+      </div>
+    </a>
+
+    <!-- Coming soon slot -->
+    <div class="article-card empty">
+      <div class="card-eyebrow">
+        <span class="pill pill-transfer">Transfers</span>
+      </div>
+      <h3 class="card-title" style="color:var(--ink-3);">Next article</h3>
+      <p class="empty-label">Coming soon</p>
+    </div>
+
+  </div>
+
+  <!-- ABOUT STRIP -->
+  <div class="about-strip">
+    <div>
+      <h4>What is The Underlap?</h4>
+      <p>The Underlap is a platform that explains football deeply and clearly with tactical storytelling, analytics made simple, and transfer narratives.</p>
+    </div>
+    <div>
+      <h4>Content pillars</h4>
+      <div class="about-pillars">
+        <div class="pillar"><div class="pillar-dot" style="background:#c8f135;"></div>Tactical Breakdowns</div>
+        <div class="pillar"><div class="pillar-dot" style="background:#a8c8f8;"></div>Data-led Stories</div>
+        <div class="pillar"><div class="pillar-dot" style="background:#f0997b;"></div>Transfer Analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- X CTA -->
+  <div class="x-cta">
+    <div class="x-cta-text">
+      <h3>The analysis continues on X</h3>
+      <p>Between articles, X is where the thinking happens in real time. Tactical threads on games as they unfold, quick data takes, transfer reactions, and conversations with other analysts. If you follow the blog, follow the account too.</p>
+    </div>
+    <a href="https://x.com/theunderlap" class="x-follow-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      Follow @TheUnderlap
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <span class="footer-logo">The Underlap</span>
+  <div class="footer-links">
+    <a href="#">Tactics</a>
+    <a href="#">Data</a>
+    <a href="#">Transfers</a>
+    <a href="#">About</a>
+  </div>
+  <span>© 2026 The Underlap · <a href="https://www.theunderlap.com" style="color:inherit;">theunderlap.com</a></span>
+</footer>
+
+</body>
+</html>
